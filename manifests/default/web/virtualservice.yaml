@@ -1,0 +1,24 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: web
+  namespace: default
+spec:
+  hosts:
+  - localhost
+  - "*"
+  gateways:
+  - istio-system/internal
+  - mesh
+  http:
+  - name: "web"
+    match:
+    - uri:
+        prefix: "/web/"
+    - uri:
+        exact: "/web"
+    rewrite:
+      uri: "/"
+    route:
+    - destination:
+        host: web.default.svc.cluster.local

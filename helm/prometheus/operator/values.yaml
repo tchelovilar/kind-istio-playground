@@ -1,0 +1,50 @@
+
+defaultRules:
+  create: true
+
+global:
+  rbac:
+    create: true
+    pspEnabled: true
+
+alertmanager:
+  enabled: false
+
+grafana:
+  enabled: false
+
+kubelet:
+  enabled: true
+
+kubeEtcd:
+  enabled: false
+
+prometheusOperator:
+  enabled: true
+
+  podAnnotations:
+    sidecar.istio.io/inject: "false"
+
+  admissionWebhooks:
+    patch:
+      podAnnotations:
+        sidecar.istio.io/inject: "false"
+
+prometheus:
+  enabled: true
+
+  ##
+  ## Mount istio certificate volumes
+  prometheusSpec:
+    podMetadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        sidecar.istio.io/userVolume: '[{"name": "istio-certs", "emptyDir": {"medium": "Memory"}}]'
+        sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-certs/"}]'
+        proxy.istio.io/config: |-
+          proxyMetadata:
+            OUTPUT_CERTS: /etc/istio-certs/
+    volumeMounts:
+    - name: istio-certs
+      mountPath: /etc/istio-certs/
+      readOnly: true

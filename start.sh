@@ -23,7 +23,10 @@ fi
 
 kubectl create -f manifests/namespaces.yaml
 
+##
+## Install certmanager
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v${CERTMANAGER_VERSION}/cert-manager.yaml
+kubectl wait -n cert-manager --timeout=300s deployment/cert-manager-webhook --for condition=available
 
 ##
 ## Set up istio operator
@@ -43,3 +46,10 @@ kubectl apply -f manifests/istio-system/istio/
 
 # Apply web container test
 kubectl apply -f manifests/default/web/
+
+##
+## Install prometheus stack
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm upgrade --install -n prometheus prometheus -f helm/prometheus/operator/values.yaml prometheus-community/kube-prometheus-stack
